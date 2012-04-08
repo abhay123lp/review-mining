@@ -20,7 +20,7 @@ public class main {
 		// TODO Auto-generated method stub
 		System.out.println("Hello,world!");
 		DBConnector db = new DBConnector();
-		//db.sql("select * from reviews_review limit 2");
+		db.sql("select * from reviews_review limit 2");
 	}
 
 }
