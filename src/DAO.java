@@ -20,29 +20,30 @@ public class DAO {
 	{
 		ArrayList<Review> reviews = new ArrayList<Review>();
 		String query = "select * from reviews_review " +
-				"where " +
-					( storeId > 0 ? "store_id = " + storeId : "")+
-					"reviewer_id in " +
+				" where " +
+					( storeId > 0 ? "store_id = " + storeId + " and ": "")+
+					" reviewer_id in " +
 						"(select id from reviews_reviewer where review_count > "+skipUserWithCount+") " +
 				"order by id " +
 				"limit " + limitIndex + "," + limitCount;
+		System.out.println(query);
 		ResultSet rs = db.sql(query);
 		
 		try {
 			while(rs.next()) {
 				Review review = new Review();
 				
-				review.id = rs.getInt(1);
-				review.reviewerId = rs.getInt(2);
-				review.storeId = rs.getInt(3);
-				review.date = rs.getDate(4);
-				review.rating = rs.getInt(5);
-				review.text = rs.getNString(6);
-				review.dateModified = rs.getDate(7);
-				review.siteId = rs.getInt(8);
-				review.duplicateCount = rs.getInt(9);
-				review.isModified = rs.getBoolean(10);
-				review.topReviewer = rs.getBoolean(11);
+				review.id = rs.getInt("id");
+				review.reviewerId = rs.getInt("reviewer_id");
+				review.storeId = rs.getInt("store_id");
+				review.date = rs.getDate("date");
+				review.rating = rs.getInt("rating");
+				review.text = rs.getString("text");
+				review.dateModified = rs.getDate("date_modified");
+				review.siteId = rs.getInt("site_id");
+				review.duplicateCount = rs.getInt("duplicate_count");
+				review.isModified = rs.getBoolean("is_modified");
+				review.topReviewer = rs.getBoolean("top_reviewer");
 				
 				reviews.add(review);
 			}
