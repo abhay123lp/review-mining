@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,15 +20,12 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("Hello,world!");
-		DBConnector db = new DBConnector();
-		db.sql("select * from reviews_review limit 2");
-		Tagging t = new Tagging() ;
-		try {
-			t.test();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//DBConnector db = new DBConnector();
+		//db.sql("select * from reviews_review limit 2");
+		
+		DAO dao = new DAO();
+		ArrayList<Review> reviews = dao.getReviews(404, 0, 100, 1);
+		
 	}
 
 }
