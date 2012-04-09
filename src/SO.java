@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -7,9 +10,41 @@ public class SO {
 	Tagging posTagger = new Tagging();
 	static HashMap<String, Integer> opinionLexicon = loadLexicons();
 	
-	static HashMap<String, Integer> loadLexicons() {
+	private static HashMap<String, Integer> loadLexicons() {
 		HashMap<String, Integer> lx = new HashMap<String, Integer>();
-		
+		try {
+    		FileReader input = new FileReader("positive-words.txt");
+    		BufferedReader bufRead = new BufferedReader(input);
+    		String line;
+    		line = bufRead.readLine();
+    		while (line != null){
+    			if (line.startsWith(";") || line.length() == 0)
+    			{	
+    				line = bufRead.readLine();
+    				continue;
+    			}
+    			lx.put(line.trim(), new Integer(1));
+    			line = bufRead.readLine();	
+    		}
+    		bufRead.close();
+    		
+    		input = new FileReader("negative-words.txt");
+    		bufRead = new BufferedReader(input);
+    		line = bufRead.readLine();
+    		while (line != null){
+    			if (line.startsWith(";") || line.length() == 0)
+    			{	
+    				line = bufRead.readLine();
+    				continue;
+    			}
+    			lx.put(line.trim(), new Integer(-1));
+    			line = bufRead.readLine();	
+    		}
+    		bufRead.close();
+    		
+    	}catch (IOException e){
+    		e.printStackTrace();
+    	}
 		return lx;
 	}
 	/**
@@ -75,8 +110,10 @@ public class SO {
 	public int getPolarityOfPhrase(String s) {
 		int k = 0;
 		for (String st: s.split(" ")) {
-			System.out.println(st.replaceAll("[^\\w]*", ""));
+			st = st.replaceAll("[^\\w]*", "");
+			if( opinionLexicon.containsKey(st) )
+				k += opinionLexicon.get(st);
 		}
-		return 0;
+		return k > 0 ? 1 : k < 0 ? -1 : 0;
 	}
 }
