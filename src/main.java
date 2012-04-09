@@ -21,6 +21,13 @@ public class main {
 		System.out.println("Hello,world!");
 		DBConnector db = new DBConnector();
 		db.sql("select * from reviews_review limit 2");
+		Tagging t = new Tagging() ;
+		try {
+			t.test();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
