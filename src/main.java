@@ -24,8 +24,10 @@ public class main {
 		//db.sql("select * from reviews_review limit 2");
 		
 		DAO dao = new DAO();
-		ArrayList<Review> reviews = dao.getReviews(404, 0, 100, 1);
-		
+		//ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 100, 1);
+		//System.out.println(dao.getStoreIds().size());
+		//System.out.println(dao.getReviewerIds().size());
+		System.out.println(dao.getReviewerIds(40, 70));
 	}
 
 }
