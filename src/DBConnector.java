@@ -43,6 +43,7 @@ public class DBConnector {
 		try {
 			Statement st = conn.createStatement();
 			rs = st.executeQuery(query);
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
