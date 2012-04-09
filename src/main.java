@@ -58,6 +58,7 @@ public class main {
 		for (Review review: reviews) {
 			ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
 			System.out.println(review.text + "\n" + phrases.toString());
+			so.getPolarityOfPhrase(review.text);
 			break;
 		}
 	}
