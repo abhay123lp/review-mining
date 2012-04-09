@@ -15,14 +15,14 @@ class Tagging {
 	public String modelFile;
 	
 	Tagging(){
-		modelFile="config/models/wsj-0-18-bidirectional-distsim.tagger";
+		modelFile="models/wsj-0-18-bidirectional-distsim.tagger";
 	}
 	
 	public void test() throws Exception {
 	
 		MaxentTagger tagger = new MaxentTagger(modelFile);
 		@SuppressWarnings("unchecked")
-		String testFile = "bin/config/sampleinput.txt";
+		String testFile = "sample-input.txt";
 		List<List<HasWord>> sentences = tagger.tokenizeText(new BufferedReader(new FileReader(testFile)));
 		for (List<HasWord> sentence : sentences) {
 			ArrayList<TaggedWord> tSentence = tagger.tagSentence(sentence);
