@@ -127,7 +127,7 @@ public class DAO {
 				review.storeId = rs.getInt("store_id");
 				review.date = rs.getDate("date");
 				review.rating = rs.getInt("rating");
-				review.text = rs.getString("text");
+				review.text = removeHtmlTags(rs.getString("text") );
 				review.dateModified = rs.getDate("date_modified");
 				review.siteId = rs.getInt("site_id");
 				review.duplicateCount = rs.getInt("duplicate_count");
@@ -141,5 +141,16 @@ public class DAO {
 		}
 		
 		return reviews;
+	}
+	
+	/**
+	 * Removes html tags and special characters from a string 
+	 * @param s
+	 * @return
+	 */
+	private String removeHtmlTags(String s) {
+		s = s.replaceAll("&nbsp;", "");
+		s = s.replaceAll("<[^>]*>", "");
+		return s;
 	}
 }

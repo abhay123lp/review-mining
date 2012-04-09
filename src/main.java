@@ -57,7 +57,7 @@ public class main {
 		ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 100, 1);
 		for (Review review: reviews) {
 			ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
-			System.out.println(phrases.toString());
+			System.out.println(review.text + "\n" + phrases.toString());
 			break;
 		}
 	}
