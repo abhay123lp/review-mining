@@ -30,11 +30,12 @@ class Tagging {
 		}
 	}
   
-	public void getTagging(String content, String model){
+	public String getTagging(String content, String model){
 		try {
 			MaxentTagger tagger = new MaxentTagger(modelFile);
 			String tagged = tagger.tagTokenizedString(content);
-			System.out.println(tagged);
+			//System.out.println(tagged);
+			return tagged;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -43,7 +44,7 @@ class Tagging {
 			e.printStackTrace();
 		}
 		
-	  
+	   return null;
 	}
 
 }
