@@ -26,6 +26,13 @@ public class main {
 		//DAO dao = new DAO();
 		//ArrayList<Review> reviews = dao.getReviews(404, 0, 100, 1);
 		testTagging();
+		
+		DAO dao = new DAO();
+		//ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 100, 1);
+		//System.out.println(dao.getStoreIds().size());
+		//System.out.println(dao.getReviewerIds().size());
+		System.out.println(dao.getReviewerIds(40, 70));
+		
 	}
 	public static void testTagging(){
 		// test Tagging 
@@ -38,5 +45,6 @@ public class main {
 			e.printStackTrace();
 		}*/
 		t.getTagging("I had a cup of tea today. Can I have another cup of tea?", "");
+
 	}
 }

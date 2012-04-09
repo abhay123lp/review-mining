@@ -7,7 +7,9 @@ import java.sql.Statement;
 
 public class DBConnector {
 	
-	DBConnector(){}
+	DBConnector(){
+		connect();
+	}
 	
 	private Connection conn = null;
 	private ResultSet rs;
@@ -17,7 +19,7 @@ public class DBConnector {
 		String dbName = "product_review";
 		String driver = "com.mysql.jdbc.Driver";
 		String userName = "root"; 
-		String password = "123456";
+		String password = "";
 		try {
 			Class.forName(driver).newInstance();
 			conn = DriverManager.getConnection(url+dbName, userName, password);
@@ -39,7 +41,7 @@ public class DBConnector {
 	}
 	
 	public ResultSet sql(String query){
-		connect();
+		//connect();
 		try {
 			Statement st = conn.createStatement();
 			rs = st.executeQuery(query);
@@ -48,7 +50,7 @@ public class DBConnector {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		disconnect();
+		//disconnect();
 		return rs;
 	}
 
