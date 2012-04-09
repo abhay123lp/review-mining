@@ -38,7 +38,7 @@ public class DBConnector {
 		}
 	}
 	
-	public void sql(String query){
+	public ResultSet sql(String query){
 		connect();
 		try {
 			Statement st = conn.createStatement();
@@ -48,6 +48,7 @@ public class DBConnector {
 			e.printStackTrace();
 		}
 		disconnect();
+		return rs;
 	}
 
 	public void getRowsFromReview(String[] columnNames, String where){
