@@ -25,14 +25,14 @@ public class main {
 		
 		//DAO dao = new DAO();
 		//ArrayList<Review> reviews = dao.getReviews(404, 0, 100, 1);
-		testTagging();
+		//testTagging();
 		
 		DAO dao = new DAO();
 		//ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 100, 1);
 		//System.out.println(dao.getStoreIds().size());
 		//System.out.println(dao.getReviewerIds().size());
-		System.out.println(dao.getReviewerIds(40, 70));
-		
+		//System.out.println(dao.getReviewerIds(40, 70));
+		testTwoWordPhrase();
 	}
 	public static void testTagging(){
 		// test Tagging 
@@ -44,7 +44,21 @@ public class main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-		t.getTagging("I had a cup of tea today. Can I have another cup of tea?", "");
+		System.out.println(
+				t.getTagging("It's a very good morning's tea. It is.", "")
+				);
 
+	}
+	
+	public static void testTwoWordPhrase() {
+		DAO dao = new DAO();
+		Tagging t = new Tagging();
+		SO so = new SO();
+		ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 100, 1);
+		for (Review review: reviews) {
+			ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
+			System.out.println(phrases.toString());
+			break;
+		}
 	}
 }
