@@ -13,9 +13,11 @@ import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 // http://nlp.stanford.edu/software/tagger.shtml
 class Tagging {
 	public String modelFile;
+	private MaxentTagger tagger;
 	
-	Tagging(){
+	Tagging() throws IOException, ClassNotFoundException{
 		modelFile="models/wsj-0-18-bidirectional-distsim.tagger";
+		tagger = new MaxentTagger(modelFile);
 	}
 	
 	public void test() throws Exception {
@@ -31,20 +33,20 @@ class Tagging {
 	}
   
 	public String getTagging(String content, String model){
-		try {
-			MaxentTagger tagger = new MaxentTagger(modelFile);
+		//try {
+			//MaxentTagger tagger = new MaxentTagger(modelFile);
 			String tagged = tagger.tagTokenizedString(content);
 			//System.out.println(tagged);
 			return tagged;
-		} catch (IOException e) {
+		/*} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
-	   return null;
+	   //return null;
 	}
 
 }

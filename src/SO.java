@@ -7,8 +7,14 @@ import java.util.Hashtable;
 
 
 public class SO {
-	Tagging posTagger = new Tagging();
+	
+
 	static HashMap<String, Integer> opinionLexicon = loadLexicons();
+	Tagging posTagger = null;
+
+	public SO () throws IOException, ClassNotFoundException {
+		posTagger = new Tagging();
+	}
 	
 	private static HashMap<String, Integer> loadLexicons() {
 		HashMap<String, Integer> lx = new HashMap<String, Integer>();
@@ -55,6 +61,7 @@ public class SO {
 	public ArrayList<String> getTwoWordPhrases(String text) {
 		ArrayList<String> phrases = new ArrayList<String>();
 		
+		if (posTagger == null) return null;
 		String taggedText = posTagger.getTagging(text, "");
 		
 		String[] tags = taggedText.split(" ");
