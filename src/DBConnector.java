@@ -19,7 +19,7 @@ public class DBConnector {
 		String dbName = "product_review";
 		String driver = "com.mysql.jdbc.Driver";
 		String userName = "root"; 
-		String password = "";
+		String password = "123456";
 		try {
 			Class.forName(driver).newInstance();
 			conn = DriverManager.getConnection(url+dbName, userName, password);

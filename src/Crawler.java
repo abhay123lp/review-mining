@@ -3,6 +3,10 @@
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
@@ -23,7 +27,7 @@ public class Crawler extends WebCrawler{
 	@Override
 	public boolean shouldVisit(WebURL url) {
 		String href = url.getURL().toLowerCase();
-		return !FILTERS.matcher(href).matches() && href.startsWith("http://www.ics.uci.edu/");
+		return !FILTERS.matcher(href).matches() && href.startsWith("http://www.google.com/");
 	}
 	
 	/**
@@ -43,7 +47,11 @@ public class Crawler extends WebCrawler{
 		
 		System.out.println("Text length: " + text.length());
 		System.out.println("Html length: " + html.length());
-		System.out.println("Number of outgoing links: " + links.size());
+		Document doc = Jsoup.parse(html);
+		
+		Element stat = doc.getElementById("resultStats");
+		System.out.println("Result Stat: "+stat.data());
+		//System.out.println("Number of outgoing links: " + links.size());
 		}
 	}
 }
