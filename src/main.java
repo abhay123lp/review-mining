@@ -31,31 +31,55 @@ public class main {
 
 	/**
 	 * @param args
+	 * step 1: get rid of data which are likely to be fake
+	 * step 2: tag position of speech
+	 * step 3: search phrase for the count number in google.com
+	 * step 4: calc SO 
+	 * step 5: get the opinion and compare with rating
+	 * step 6: calc recall and precision
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		//System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
-		//testCrawler();
-		try {
-			testSearch();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		/*Document doc = null;
-		try {
-			doc = Jsoup.connect("http://www.google.com/search?hl=en&q=ipod&aq=f&oq=&aqi=g10").userAgent("Mozilla/5.0 (X11; U; Linux x86_64; en-GB; rv:1.8.1.6) Gecko/20070723 Iceweasel/2.0.0.6 (Debian-2.0.0.6-0etch1)").get();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		Elements newsHeadlines = doc.select("resultStats");
-		System.out.println(newsHeadlines.toString());*/
 		
 		DAO dao = new DAO();
-		testTwoWordPhrase();
+		try {
+			int cnt = 0;
+			SO so = new SO();
+			ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 1, 1);
+			for (Review review: reviews) {
+				ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
+				System.out.println("count: "+cnt);
+				double sum = 0.0;
+				for (String phrase: phrases){
+					System.out.println("phrase: "+ phrase);
+					if(phrase.contains("/") || phrase.contains(","))
+						continue;
+					Opinion opinion = new Opinion();
+					long postive = opinion.getCntFromGoogle(phrase + " excellent");
+					long excellent = opinion.getCntFromGoogle("excellent");
+					long negtive = opinion.getCntFromGoogle(phrase + " poor");
+					long poor = opinion.getCntFromGoogle("poor");
+					double score = Math.log((double)(postive*poor)/(double)(negtive*excellent));
+					sum += score;
+					System.out.println(postive +"\t"+excellent+"\t"+negtive+"\t"+poor+"\tscore: "+score);
+				}
+				cnt++;
+				System.out.println("averge score: "+ (double)sum/cnt);
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		//testGoogleSearchResult();
 
 	}
+	
 	public static void testTagging(){
 		// test Tagging 
 		//Tagging t = new Tagging() ;
@@ -107,6 +131,18 @@ public class main {
 		}
 	}
 	
+	public static void testGoogleSearchResult(){
+		try {
+			long cnt1 = testSearch();
+			System.out.println(cnt1);
+			Opinion o = new Opinion();
+			long cnt2 = o.getCntFromGoogle("Xinjiang Shao");
+			System.out.println(cnt2);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public static long testSearch() throws IOException{
 		

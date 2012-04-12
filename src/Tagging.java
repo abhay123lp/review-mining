@@ -7,6 +7,7 @@ import java.util.List;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.HasWord;
+import edu.stanford.nlp.process.DocumentPreprocessor;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 // get more information on 
 // http://www.computing.dcu.ie/~acahill/tagset.html
@@ -16,7 +17,8 @@ class Tagging {
 	private MaxentTagger tagger;
 	
 	Tagging() throws IOException, ClassNotFoundException{
-		modelFile="models/wsj-0-18-bidirectional-distsim.tagger";
+		modelFile="models/wsj-0-18-left3words.tagger";
+		//modelFile="models/wsj-0-18-bidirectional-distsim.tagger";
 		tagger = new MaxentTagger(modelFile);
 	}
 	
@@ -32,6 +34,14 @@ class Tagging {
 		}
 	}
   
+	public String getSentences(String content){
+		DocumentPreprocessor dp = new DocumentPreprocessor(content);
+		for (List sentence: dp){
+			//System.out.println(sentence.toString()+"\r\n");
+		}
+		System.out.println("==========sentence");
+		return "";
+	}
 	public String getTagging(String content, String model){
 		//try {
 			//MaxentTagger tagger = new MaxentTagger(modelFile);
@@ -48,6 +58,8 @@ class Tagging {
 		
 	   //return null;
 	}
+
+
 
 }
 
