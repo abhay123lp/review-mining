@@ -63,6 +63,7 @@ public class SO {
 		
 		if (posTagger == null) return null;
 		String taggedText = posTagger.getTagging(text, "");
+		posTagger.getSentences(text);
 		
 		String[] tags = taggedText.split(" ");
 		
