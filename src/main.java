@@ -99,29 +99,63 @@ public class main {
 	
 	public static void testTwoWordPhrase() {
 		DAO dao = new DAO();
-		int count = 0;
+		int count = 0, reviewcount=0;
+		int quota = 50;
 		//Timestamp t = 
 		try {
-			FileWriter fw = new FileWriter("test_output.txt");
-			//Tagging t = new Tagging();
-			SO so = new SO();
-			
-			ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 100, 1);
-			for (Review review: reviews) {
-				ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
-				fw.write(review.text + "\n" + phrases.toString());
-				int i=0, k, sum=0;
-				for (String s: phrases) {
-					k = so.getPolarityOfPhrase(s);
-					fw.write(s + " : " + k );
-					sum += k;
-					i++;
+			ArrayList<Integer> reviewIds = dao.getIdsByVeryCustomQuery();
+			FileWrite phraseFile = new FileWrite("reviewPhrases.txt");
+			FileWrite ratingsFile = new FileWrite("ratings.txt");
+			FileWrite fw = new FileWrite("test_output_0.txt");
+			while (true) {
+				int start = count * quota;
+				if (start >= reviewIds.size()) break;
+				int end = start + quota >= reviewIds.size() ? reviewIds.size()
+															: start + quota; // end index is exclusive
+				String idString = reviewIds.subList(start, end).toString().replace('[', ' ').replace(']', ' ');
+				
+				
+				//Tagging t = new Tagging();
+				SO so = new SO();
+				//int tp = 0, tn = 0, fp = 0, fn = 0;
+				ArrayList<Review> reviews = dao.getReviewsHavingIdsInList(idString);
+				for (Review review: reviews) {
+					try {
+						ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
+						fw.writeLine(review.text + "\n" + phrases.toString());
+						int i=0, k, sum=0;
+						for (String s: phrases) {
+							k = so.getPolarityOfPhrase(s);
+							fw.writeLine(s + " : " + k );
+							sum += k;
+							i++;
+						}
+						double cr = (i > 0 ?(1.0*sum/i):0);
+						fw.writeLine("rating: "+ review.rating + " " + cr);
+						phraseFile.writeLine(review.id + "::"
+								+ review.rating + "::"
+								+ phrases.toString());
+		
+						ratingsFile.writeLine(review.id + " " + review.rating + " " + cr + " "
+								+ ((review.rating > 3) ? (cr > 0 ? 0 : 3): (cr < 0 ? 1 : 2) ));
+						// tp 0, tn 1, fp 2, fn 3
+						
+						System.out.println("... processed " + ++reviewcount + " ...");
+						//if (count > 50) break; // more causes memory overflow
+						//if (count % 50 == 0) so = new SO();
+						
+						if (count % 20 == 0) {
+							fw.close(); // split file
+							fw = new FileWrite("test_output_"+(count/20)+".txt");
+						}
+					}catch (Exception e) {
+						System.err.println("error getting tagged: " + e.toString());
+					}
 				}
-				fw.write("rating: "+ review.rating + " " + 
-							(i > 0 ?(1.0*sum/i):0));
-				System.out.println("... processed " + ++count + " ...");
-				if (count > 50) break; // more causes memory overflow
+				count++; // count 50s
 			}
+			phraseFile.close();
+			ratingsFile.close();
 			fw.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -130,55 +164,4 @@ public class main {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void testGoogleSearchResult(){
-		try {
-			long cnt1 = testSearch();
-			System.out.println(cnt1);
-			Opinion o = new Opinion();
-			long cnt2 = o.getCntFromGoogle("Xinjiang Shao");
-			System.out.println(cnt2);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public static long testSearch() throws IOException{
-		
-            try {
-                    URL url = new URL("http://www.google.com/search?hl=en&q=ipod&aq=f&oq=&aqi=g10");
-                    URLConnection conn =  url.openConnection();
-                    conn.setRequestProperty("User-Agent",
-                                    "Mozilla/5.0 (X11; U; Linux x86_64; en-GB; rv:1.8.1.6) Gecko/20070723 Iceweasel/2.0.0.6 (Debian-2.0.0.6-0etch1)");
-                    BufferedReader in = new BufferedReader(
-                            new InputStreamReader(conn.getInputStream())
-                    );
-                    String str;
-                    String content ="";
-                    while ((str = in.readLine()) != null) {
-                    	content += str;
-                		//System.out.println(newsHeadlines.toString());
-                		//System.out.println(str);
-                    }
-
-                    in.close();
-                    
-                    Document doc = null;
-                	doc =  Jsoup.parse(content);
-                	//doc.body().toString();
-                	//System.out.println(Jsoup.clean(str, myWhitelist));
-                	
-                	//System.out.println(doc.body().select("table tr td div#subform_ctrl").toString());
-                	Elements newsHeadlines = doc.body().select("table tr td div#subform_ctrl");
-                	String cnt = newsHeadlines.select("div > div:eq(1)").text().toString();
-                	String delims = "[ ]";
-                	String[] tokens = cnt.split(delims);
-                	return Long.parseLong(tokens[1].replace(",", ""));
-            }
-            catch (MalformedURLException e) {}
-            catch (IOException e) {}
-            return 0;
-	}
-
 }

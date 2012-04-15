@@ -46,6 +46,14 @@ public class DAO {
 		return getReviews( query);
 	}
 	
+	public ArrayList<Review> getReviewsHavingIdsInList(String idList) {
+		String query = "select * from reviews_review " +
+				" where " +
+					" id in (" + idList + ")";
+		//System.out.println(query);
+		return getReviews( query);
+	}
+	
 	/**
 	 * 
 	 * @return All the reviewer's id's
@@ -117,7 +125,7 @@ public class DAO {
 	private ArrayList<Review> getReviews(String query) {
 		ArrayList<Review> reviews = new ArrayList<Review>();
 		ResultSet rs = db.sql(query);
-		
+		System.err.println(query);
 		try {
 			while(rs.next()) {
 				Review review = new Review();
@@ -153,4 +161,24 @@ public class DAO {
 		s = s.replaceAll("<[^>]*>", "");
 		return s;
 	}
+	
+	public ArrayList<Integer> getIdsByVeryCustomQuery() {
+		String query = "select id  " +
+				" from reviews_review " +
+				" where rating != 3 and reviewer_id in " +
+					" (SELECT id FROM `reviews_reviewer` where review_count <= 30 and review_count > 1) " +
+				" group by reviewer_id,DATE_FORMAT(date, \"%y-%m-%d\") having count(id) <= 1";
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		ResultSet rs = db.sql(query);
+		
+		try {
+			while(rs.next()) {
+				idList.add(rs.getInt(1));
+			}
+		} catch( Exception e ) {
+			System.err.println("Error reading resultset in DAO.getIdsByVeryCustomQuery(): " + e.toString());
+		}
+		return idList;
+	}
+	
 }
