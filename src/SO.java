@@ -1,9 +1,12 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 
 import edu.stanford.nlp.ling.TaggedWord;
 
@@ -65,7 +68,7 @@ public class SO {
 		
 		if (posTagger == null) return null;
 		String taggedText = posTagger.getTagging(text, "");
-		posTagger.getSentences(text);
+		//posTagger.getSentences(text);
 		
 		String[] tags = taggedText.split(" ");
 		
@@ -173,5 +176,40 @@ public class SO {
 				k += opinionLexicon.get(st);
 		}
 		return k > 0 ? 1 : k < 0 ? -1 : 0;
+	}
+	
+	public HashMap<Review,ArrayList<String>> getTwoWordPhraseFromFile(){
+		HashMap<Review,ArrayList<String>> hm = new HashMap<Review,ArrayList<String>>();
+		BufferedReader buf = null;
+		try {
+			buf = new BufferedReader(new FileReader("reviewPhrases.txt"));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String line = null;
+		List<String[]> rows = new ArrayList<String[]>();
+		try {
+			while((line=buf.readLine())!=null) {
+			   if (line.isEmpty())
+					   continue;
+			   String[] row = line.split("::");
+			   Review review = new Review();
+			   review.id = Integer.parseInt(row[0]);
+			   review.rating = Integer.parseInt(row[1]);
+			   //ArrayList<String> phrases = new ArrayList<String>();
+			   ArrayList<String> list = new ArrayList<String>(Arrays.asList(row[2].substring(1, row[2].length() - 1).split(",")));
+			   hm.put(review,  list);
+			   //phrases = (ArrayList<String>) Arrays.asList(row[2].split(","));
+			   //System.out.println(list.toString());
+			   //rows.add(row);   
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return hm;
+		
 	}
 }

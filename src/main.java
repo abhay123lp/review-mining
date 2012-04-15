@@ -1,7 +1,9 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,17 +43,57 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		/*DAO dao = new DAO();
+		HashMap<Review, ArrayList<String>> hm = new HashMap<Review, ArrayList<String>>();
+		
 		try {
-			int cnt = 0;
+			BufferedWriter fw = new BufferedWriter(new FileWriter("output_result.txt"));
+			
 			SO so = new SO();
-			ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 1, 1);
-			for (Review review: reviews) {
-				ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
-				System.out.println("count: "+cnt);
+			//ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 1, 1);
+			//ArrayList<String> phrases = null;
+			
+			hm = so.getTwoWordPhraseFromFile();
+			Iterator entries = hm.entrySet().iterator();
+			int amount = 0;
+			Opinion opinion2 = new Opinion();
+			long excellent = opinion2.getCntFromBing("excellent");
+			long poor = opinion2.getCntFromBing("poor");
+			while (entries.hasNext() && amount<100) {
+				
+			  int cnt = 0;
+			  Map.Entry<Review, ArrayList<String>> thisEntry = (Map.Entry<Review, ArrayList<String>>) entries.next();
+			  Review key = (Review)(thisEntry.getKey());
+			  ArrayList<String> value =(ArrayList<String>)(thisEntry.getValue());
+			  double sum =0.0;
+			  System.out.println("amount: "+amount);
+			  // phrase
+
+			  for (String phrase : value){
+				  if(phrase.contains("/") || phrase.contains(",") || phrase.contains(".com") || phrase.contains("!"))
+						continue;
+				  System.out.print(phrase);
+					Opinion opinion = new Opinion();
+					long postive = opinion.getCntFromBing(phrase.trim() + " excellent");
+					
+					long negtive = opinion.getCntFromBing(phrase.trim() + " poor");
+					
+					double score = Math.log((double)(postive*poor)/(double)(negtive*excellent+0.001));
+					//System.out.println(postive +"\t"+excellent+"\t"+negtive+"\t"+poor+"\tscore: "+score);
+					sum += score;
+					cnt++;
+			  }
+			  amount++;
+			  System.out.println(" "+key.id+","+key.rating+","+(double)sum/cnt);
+			  fw.write(key.id+","+key.rating+","+(double)sum/cnt+"\r\n");
+			  
+			}
+			fw.close();
+			/*for (Review review: reviews) {
+				//ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
+				//System.out.println("count: "+cnt);
 				double sum = 0.0;
 				for (String phrase: phrases){
-					System.out.println("phrase: "+ phrase);
+					//System.out.println("phrase: "+ phrase);
 					if(phrase.contains("/") || phrase.contains(","))
 						continue;
 					Opinion opinion = new Opinion();
@@ -61,11 +103,11 @@ public class main {
 					long poor = opinion.getCntFromGoogle("poor");
 					double score = Math.log((double)(postive*poor)/(double)(negtive*excellent));
 					sum += score;
-					System.out.println(postive +"\t"+excellent+"\t"+negtive+"\t"+poor+"\tscore: "+score);
+					//System.out.println(postive +"\t"+excellent+"\t"+negtive+"\t"+poor+"\tscore: "+score);
 				}
 				cnt++;
-				System.out.println("averge score: "+ (double)sum/cnt);
-			}
+				System.out.println(review.id+","+review.rating+","+(double)sum/cnt);
+			}*/
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -73,28 +115,31 @@ public class main {
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 		
 		
 		//testGoogleSearchResult();
-		//testTagging();
-		testTwoWordPhrase();
+
 	}
 	
+	private static ArrayList<Review> readReviewsFromFile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public static void testTagging(){
+		// test Tagging 
+		//Tagging t = new Tagging() ;
 		
-		try {
-			// test Tagging 
-			Tagging t = new Tagging() ;
-			//t.test();
-			System.out.println(
-					t.getTagging("It's a very good , morning's tea. It is.", "")
-					);
-			t.getTaggingSplittedSentence("It's a very good , morning's tea. It is.");
+		/*try {
+			t.test();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
+		System.out.println(
+		//		t.getTagging("It's a very good morning's tea. It is.", "")
+				);
 
 	}
 
@@ -117,39 +162,32 @@ public class main {
 				String idString = reviewIds.subList(start, end).toString().replace('[', ' ').replace(']', ' ');
 				
 				
-				Tagging tagging = new Tagging();
+				//Tagging t = new Tagging();
 				SO so = new SO();
 				//int tp = 0, tn = 0, fp = 0, fn = 0;
 				ArrayList<Review> reviews = dao.getReviewsHavingIdsInList(idString);
 				for (Review review: reviews) {
 					try {
-						ArrayList<String> phrases = new ArrayList<String>();//so.getTwoWordPhrases(review.text);
-						ArrayList<ArrayList> tokenizeds = tagging.getTaggingSplittedSentence(review.text);
-						ArrayList<ArrayList> phraseList = new ArrayList<ArrayList>();
+						ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
+						fw.writeLine(review.text + "\n" + phrases.toString());
 						int i=0, k, sum=0;
-						fw.writeLine(review.text + "\r\n" + tokenizeds);
-						for (ArrayList sentenceTokens: tokenizeds) { 
-							phrases = so.getTwoWordPhrases(sentenceTokens);
-							fw.writeLine(phrases.toString());
-							phraseList.add(phrases);
-							for (String s: phrases) {
-								k = so.getPolarityOfPhrase(s);
-								fw.writeLine(s + " : " + k );
-								sum += k;
-								i++;
-							}
+						for (String s: phrases) {
+							k = so.getPolarityOfPhrase(s);
+							fw.writeLine(s + " : " + k );
+							sum += k;
+							i++;
 						}
 						double cr = (i > 0 ?(1.0*sum/i):0);
 						fw.writeLine("rating: "+ review.rating + " " + cr);
 						phraseFile.writeLine(review.id + "::"
 								+ review.rating + "::"
-								+ phraseList.toString());
+								+ phrases.toString());
 		
 						ratingsFile.writeLine(review.id + " " + review.rating + " " + cr + " "
 								+ ((review.rating > 3) ? (cr > 0 ? 0 : 3): (cr < 0 ? 1 : 2) ));
 						// tp 0, tn 1, fp 2, fn 3
 						
-						System.out.println("... processed " + ++reviewcount + " ... id: " + review.id);
+						System.out.println("... processed " + ++reviewcount + " ...");
 						//if (count > 50) break; // more causes memory overflow
 						//if (count % 50 == 0) so = new SO();
 						
@@ -172,5 +210,71 @@ public class main {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	
+	public static void testGoogleSearchResult(){
+		try {
+			long cnt1 = testSearch();
+			System.out.println(cnt1);
+			Opinion o = new Opinion();
+			long cnt2 = o.getCntFromGoogle("Xinjiang Shao");
+			System.out.println(cnt2);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static long testSearch() throws IOException{
+		
+            try {
+                    URL url = new URL("http://www.google.com/search?hl=en&q=ipod&aq=f&oq=&aqi=g10");
+                    HttpURLConnection connect = (HttpURLConnection) url.openConnection();
+                    connect.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; U; Linux x86_64; en-GB; rv:1.8.1.6) Gecko/20070723 Iceweasel/2.0.0.6 (Debian-2.0.0.6-0etch1)");
+                    int status = connect.getResponseCode();
+                    System.out.println(status);
+                    if (status != 200)
+                    {
+                    	try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    	return testSearch();
+                    }
+                   // URLConnection conn =  url.openConnection();
+                   // conn.setRequestProperty("User-Agent",
+                    //                "Mozilla/5.0 (X11; U; Linux x86_64; en-GB; rv:1.8.1.6) Gecko/20070723 Iceweasel/2.0.0.6 (Debian-2.0.0.6-0etch1)");
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(connect.getInputStream())
+                    );
+                    String str;
+                    String content ="";
+                    while ((str = in.readLine()) != null) {
+                    	content += str;
+                		//System.out.println(newsHeadlines.toString());
+                		//System.out.println(str);
+                    }
+
+                    in.close();
+                    System.out.println(content);
+                    Document doc = null;
+                	doc =  Jsoup.parse(content);
+                	//doc.body().toString();
+                	//System.out.println(Jsoup.clean(str, myWhitelist));
+                	
+                	//System.out.println(doc.body().select("table tr td div#subform_ctrl").toString());
+                	Elements newsHeadlines = doc.body().select("table tr td div#subform_ctrl");
+                	String cnt = newsHeadlines.select("div > div:eq(1)").text().toString();
+                	String delims = "[ ]";
+                	String[] tokens = cnt.split(delims);
+                	return Long.parseLong(tokens[1].replace(",", ""));
+            }
+            catch (MalformedURLException e) { e.printStackTrace(); }
+            catch (IOException e) {}
+            return -1;
 	}
 }
