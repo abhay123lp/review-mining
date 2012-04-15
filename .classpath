@@ -22,5 +22,7 @@
 	<classpathentry kind="lib" path="tika-core-1.0.jar"/>
 	<classpathentry kind="lib" path="tika-parsers-1.0.jar"/>
 	<classpathentry kind="lib" path="jsoup-1.6.2.jar"/>
+	<classpathentry kind="lib" path="gson-1.4.jar"/>
+	<classpathentry kind="lib" path="bing-search-java-sdk.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
