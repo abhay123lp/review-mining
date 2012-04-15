@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +36,11 @@ class Tagging {
 	}
   
 	public String getSentences(String content){
-		DocumentPreprocessor dp = new DocumentPreprocessor(content);
+		StringReader strRdr = new StringReader(content);
+		DocumentPreprocessor dp = new DocumentPreprocessor(strRdr);
 		for (List sentence: dp){
-			//System.out.println(sentence.toString()+"\r\n");
+			System.out.println(sentence);
 		}
-		System.out.println("==========sentence");
 		return "";
 	}
 	public String getTagging(String content, String model){
@@ -57,6 +58,23 @@ class Tagging {
 		}*/
 		
 	   //return null;
+	}
+	
+	public ArrayList<ArrayList> getTaggingSplittedSentence(String text) {
+		ArrayList<ArrayList> tagged = new ArrayList<ArrayList>();
+		
+		StringReader strRdr = new StringReader(text);
+		DocumentPreprocessor dp = new DocumentPreprocessor(strRdr);
+		for (List sentence: dp){
+			ArrayList<TaggedWord> tSentence = tagger.tagSentence(sentence);
+			tagged.add(tSentence);
+			/*for (TaggedWord word: tSentence) {
+				System.out.println(word.tag() +" -> "+ word.word() );
+			}*/
+			//System.out.println(sentence);
+		}
+		//System.out.println(tagged);
+		return tagged;
 	}
 
 

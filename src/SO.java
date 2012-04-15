@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import edu.stanford.nlp.ling.TaggedWord;
+
 
 public class SO {
 	
@@ -103,12 +105,60 @@ public class SO {
 				}
 				n = j = r = false;
 			}
+			else n = j = r = false; // end of a sentence
 			
 		}
 		
 		return phrases;
 	}
-	
+
+	/**
+	 * Gets the two-words phrases of Adj-N, Adv-Adj, Adj-Adj, N-Adj or Adv-V form using POS and search
+	 * @param text to be analyzed
+	 * @return ArrayList<String> of phrases
+	 */
+	public ArrayList<String> getTwoWordPhrases(ArrayList<TaggedWord> taggedWords) {
+		ArrayList<String> phrases = new ArrayList<String>();
+		
+		boolean n = false, j = false, r = false;
+		for (int i=0; i<taggedWords.size(); i++) {
+			if (taggedWords.get(i).tag().startsWith("JJ")) {
+				// JJ-JJ, RB-JJ, or NN-JJ, or reset for JJ-NN
+				if (j || n || r) { // previous JJ or NN
+					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
+					phrases.add(s);
+				}
+				j = true;
+				n = r = false;
+			}
+			else if (taggedWords.get(i).tag().startsWith("NN")) {
+				// JJ-NN, or reset for NN-JJ
+				if (j) { // previous JJ
+					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
+					phrases.add(s);
+				}
+				n = true;
+				j = r = false;
+			}
+			else if (taggedWords.get(i).tag().startsWith("RB")) {
+				// reset for RB-VB or RB-JJ
+				n = j = false;
+				r = true;
+			}
+			else if (taggedWords.get(i).tag().startsWith("VB")) {
+				// RB-VB
+				if (r) { // previous JJ
+					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
+					phrases.add(s);
+				}
+				n = j = r = false;
+			}
+			else n = j = r = false; // end of a sentence
+			
+		}
+		
+		return phrases;
+	}
 	/**
 	 * Returns a phrase if it's world are majority in +ve or -ve side
 	 * Need to formulate better algorithm, e.g. "extremely bad" vs "extremely good"
