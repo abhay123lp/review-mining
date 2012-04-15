@@ -41,7 +41,7 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		DAO dao = new DAO();
+		/*DAO dao = new DAO();
 		try {
 			int cnt = 0;
 			SO so = new SO();
@@ -73,26 +73,28 @@ public class main {
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 		//testGoogleSearchResult();
-
+		//testTagging();
+		testTwoWordPhrase();
 	}
 	
 	public static void testTagging(){
-		// test Tagging 
-		//Tagging t = new Tagging() ;
 		
-		/*try {
-			t.test();
+		try {
+			// test Tagging 
+			Tagging t = new Tagging() ;
+			//t.test();
+			System.out.println(
+					t.getTagging("It's a very good , morning's tea. It is.", "")
+					);
+			t.getTaggingSplittedSentence("It's a very good , morning's tea. It is.");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-		System.out.println(
-		//		t.getTagging("It's a very good morning's tea. It is.", "")
-				);
+		}
 
 	}
 
@@ -115,32 +117,39 @@ public class main {
 				String idString = reviewIds.subList(start, end).toString().replace('[', ' ').replace(']', ' ');
 				
 				
-				//Tagging t = new Tagging();
+				Tagging tagging = new Tagging();
 				SO so = new SO();
 				//int tp = 0, tn = 0, fp = 0, fn = 0;
 				ArrayList<Review> reviews = dao.getReviewsHavingIdsInList(idString);
 				for (Review review: reviews) {
 					try {
-						ArrayList<String> phrases = so.getTwoWordPhrases(review.text);
-						fw.writeLine(review.text + "\n" + phrases.toString());
+						ArrayList<String> phrases = new ArrayList<String>();//so.getTwoWordPhrases(review.text);
+						ArrayList<ArrayList> tokenizeds = tagging.getTaggingSplittedSentence(review.text);
+						ArrayList<ArrayList> phraseList = new ArrayList<ArrayList>();
 						int i=0, k, sum=0;
-						for (String s: phrases) {
-							k = so.getPolarityOfPhrase(s);
-							fw.writeLine(s + " : " + k );
-							sum += k;
-							i++;
+						fw.writeLine(review.text + "\r\n" + tokenizeds);
+						for (ArrayList sentenceTokens: tokenizeds) { 
+							phrases = so.getTwoWordPhrases(sentenceTokens);
+							fw.writeLine(phrases.toString());
+							phraseList.add(phrases);
+							for (String s: phrases) {
+								k = so.getPolarityOfPhrase(s);
+								fw.writeLine(s + " : " + k );
+								sum += k;
+								i++;
+							}
 						}
 						double cr = (i > 0 ?(1.0*sum/i):0);
 						fw.writeLine("rating: "+ review.rating + " " + cr);
 						phraseFile.writeLine(review.id + "::"
 								+ review.rating + "::"
-								+ phrases.toString());
+								+ phraseList.toString());
 		
 						ratingsFile.writeLine(review.id + " " + review.rating + " " + cr + " "
 								+ ((review.rating > 3) ? (cr > 0 ? 0 : 3): (cr < 0 ? 1 : 2) ));
 						// tp 0, tn 1, fp 2, fn 3
 						
-						System.out.println("... processed " + ++reviewcount + " ...");
+						System.out.println("... processed " + ++reviewcount + " ... id: " + review.id);
 						//if (count > 50) break; // more causes memory overflow
 						//if (count % 50 == 0) so = new SO();
 						
