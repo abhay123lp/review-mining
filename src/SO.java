@@ -177,12 +177,60 @@ public class SO {
 		}
 		return k > 0 ? 1 : k < 0 ? -1 : 0;
 	}
-	
-	public HashMap<Review,ArrayList<String>> getTwoWordPhraseFromFile(){
-		HashMap<Review,ArrayList<String>> hm = new HashMap<Review,ArrayList<String>>();
+	public HashMap<Review,ArrayList<ArrayList<String>>> getTwoWordPhraseFromFile(){
+		HashMap<Review,ArrayList<ArrayList<String>>> hm = new HashMap<Review,ArrayList<ArrayList<String>>>();
 		BufferedReader buf = null;
 		try {
 			buf = new BufferedReader(new FileReader("reviewPhrases.txt"));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String line = null;
+		//List<String[]> rows = new ArrayList<String[]>();
+		
+		try {
+			while((line=buf.readLine())!=null) {
+			   if (line.isEmpty())
+					   continue;
+			   ArrayList<ArrayList<String>> comments= new ArrayList<ArrayList<String>>();
+			   String[] row = line.split("::");
+			   Review review = new Review();
+			   review.id = Integer.parseInt(row[0]);
+			   review.rating = Integer.parseInt(row[1]);
+			   //ArrayList<String> phrases = new ArrayList<String>();
+			   ArrayList<String> lists = new ArrayList<String>(Arrays.asList(row[2].trim().substring(1, row[2].length() - 1).split("]")));
+			   for(int i = 0;i < lists.size(); i++)
+		       {
+				   	
+		            String temp = lists.get(i);
+		            if(temp.contains("["))
+		            	temp = temp.replace("[", "");
+		            if(temp.startsWith(","))
+		            	temp = temp.replaceFirst(",", "");
+		            if(temp.trim().isEmpty())
+		            	continue;
+		            //System.out.println("temp: "+temp.trim());
+		            ArrayList<String> sentence = new ArrayList<String>(Arrays.asList(temp.trim().split(",")));
+		            comments.add(sentence);
+		        }
+			    hm.put(review,  comments);
+			   //phrases = (ArrayList<String>) Arrays.asList(row[2].split(","));
+			   //System.out.println(list.toString());
+			   //rows.add(row);   
+			}
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return hm;
+	}
+	public HashMap<Review,ArrayList<String>> getTwoWordPhraseFromFile2(){
+		HashMap<Review,ArrayList<String>> hm = new HashMap<Review,ArrayList<String>>();
+		BufferedReader buf = null;
+		try {
+			buf = new BufferedReader(new FileReader("reviewPhrases2.txt"));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
