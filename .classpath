@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="jsoup-1.6.2.jar"/>
 	<classpathentry kind="lib" path="gson-1.4.jar"/>
 	<classpathentry kind="lib" path="bing-search-java-sdk.jar"/>
+	<classpathentry kind="lib" path="twitter4j-core-2.2.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

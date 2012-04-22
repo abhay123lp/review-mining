@@ -157,8 +157,10 @@ public class DAO {
 	 * @return
 	 */
 	private String removeHtmlTags(String s) {
-		s = s.replaceAll("&nbsp;", "");
 		s = s.replaceAll("<[^>]*>", "");
+		s = s.replaceAll("&nbsp;", "");
+		s = s.replaceAll("&lt;", "less than");
+		s = s.replaceAll("&gt;", "greater than");
 		return s;
 	}
 	

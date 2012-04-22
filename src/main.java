@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jsoup.Jsoup;
@@ -42,7 +43,59 @@ public class main {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		//Opinion opinion2 = new Opinion();
+		//opinion2.getCntFromTweeter("source:twitter4j yusukey");
+		runSentenceWiseAlgo();
+	   
+		//testGoogleSearchResult();
+
+	}
+	public static void runSentenceWiseAlgo(){
+		HashMap<Review, ArrayList<ArrayList<String>>> hm = new HashMap<Review, ArrayList<ArrayList<String>>>();
 		
+		try {
+			BufferedWriter fw = new BufferedWriter(new FileWriter("output_result_sentencewise.txt"));
+			SO so = new SO();
+			hm = so.getTwoWordPhraseFromFile();
+			Iterator entries = hm.entrySet().iterator();
+			int amount = 0;
+			Opinion opinion2 = new Opinion();
+			long excellent = opinion2.getCntFromBing("excellent");
+			long poor = opinion2.getCntFromBing("poor");
+			
+			while (entries.hasNext() && amount<100) {
+				int cnt = 0;
+				double sum=0.0;
+				Map.Entry<Review, ArrayList<ArrayList<String>>> thisEntry = (Entry<Review, ArrayList<ArrayList<String>>>) entries.next();
+				Review key = (Review)(thisEntry.getKey());
+				ArrayList<ArrayList<String>> value =(ArrayList<ArrayList<String>>)(thisEntry.getValue());
+				for (int i = 0; i < value.size(); i++){
+					ArrayList<String> sentences = value.get(i);
+					for (String phrase : sentences){
+						System.out.println(phrase.trim());
+						Opinion opinion = new Opinion();
+						long postive = opinion.getCntFromBing(phrase.trim() + " excellent");
+						long negtive = opinion.getCntFromBing(phrase.trim() + " poor");
+						double score = Math.log((double)(postive*poor)/(double)(negtive*excellent+0.001));
+						sum += score;
+						cnt++;
+					}
+				}
+					
+				amount++;
+				System.out.println(" "+key.id+","+key.rating+","+(double)sum/cnt);
+				fw.write(key.id+","+key.rating+","+(double)sum/cnt+"\r\n");
+			}
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void runNonSentenceSplitAlgo(){
 		HashMap<Review, ArrayList<String>> hm = new HashMap<Review, ArrayList<String>>();
 		
 		try {
@@ -52,7 +105,7 @@ public class main {
 			//ArrayList<Review> reviews = dao.getReviewsByStoreId(404, 0, 1, 1);
 			//ArrayList<String> phrases = null;
 			
-			hm = so.getTwoWordPhraseFromFile();
+			hm = so.getTwoWordPhraseFromFile2();
 			Iterator entries = hm.entrySet().iterator();
 			int amount = 0;
 			Opinion opinion2 = new Opinion();
@@ -116,15 +169,6 @@ public class main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		//testGoogleSearchResult();
-
-	}
-	
-	private static ArrayList<Review> readReviewsFromFile() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public static void testTagging(){

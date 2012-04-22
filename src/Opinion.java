@@ -11,6 +11,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import twitter4j.Query;
+import twitter4j.QueryResult;
+import twitter4j.Tweet;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+
 import com.google.code.bing.search.client.BingSearchClient;
 import com.google.code.bing.search.client.BingSearchClient.SearchRequestBuilder;
 import com.google.code.bing.search.client.BingSearchServiceClientFactory;
@@ -20,6 +27,7 @@ import com.google.code.bing.search.schema.SearchResponse;
 import com.google.code.bing.search.schema.SourceType;
 import com.google.code.bing.search.schema.web.WebResult;
 import com.google.code.bing.search.schema.web.WebSearchOption;
+import com.sun.tools.javac.util.List;
 
 
 public class Opinion {
@@ -38,6 +46,22 @@ public class Opinion {
 	
 	public int getOpinion(int storeid){
 		return opinion;
+	}
+	public long getCntFromTweeter(String keyword){
+		Twitter twitter = new TwitterFactory().getInstance();
+        try {
+            QueryResult result = twitter.search(new Query(keyword));
+            java.util.List<Tweet> tweets = result.getTweets();
+            System.out.println("CI: "+result.getCompletedIn()+"\tPerPage:"+result.getResultsPerPage()+"\tPage:"+result.getPage());
+            for (Tweet tweet : tweets) {
+                System.out.println("@" + tweet.getFromUser() + " - " + tweet.getText());
+            }
+            
+        } catch (TwitterException te) {
+            te.printStackTrace();
+            System.out.println("Failed to search tweets: " + te.getMessage());
+        }
+		return 0;
 	}
 	public long getCntFromBing(String keyword){
 		if(keyword.isEmpty())
