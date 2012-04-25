@@ -177,7 +177,7 @@ public class SO {
 		for (int i=0; i<taggedWords.size(); i++) {
 			
 			if (j_2 && !taggedWords.get(i).tag().startsWith("NN")) {	// {rb, jj, nn}-> jj -> not nn
-				String s = taggedWords.get(i-2).word() + " " + taggedWords.get(i).word(i-1);
+				String s = taggedWords.get(i-2).word() + " " + taggedWords.get(i-1).word();
 				phrases.add(s);
 				j_2 = false;
 			}
