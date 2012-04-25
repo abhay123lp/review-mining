@@ -181,6 +181,16 @@ public class SO {
 				phrases.add(s);
 				j_2 = false;
 			}
+			else if (taggedWords.get(i).tag().startsWith("NN")) {
+				// JJ-NN, or reset for NN-JJ
+				if (j) { // previous JJ
+					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
+					phrases.add(s);
+				}
+				n = true;
+				j_2 = j = r = false;
+			}
+			
 			if (taggedWords.get(i).tag().startsWith("JJ")) {
 				// JJ-JJ, RB-JJ, or NN-JJ, or reset for JJ-NN
 				if (j || n || r) { // previous JJ or NN or RB
@@ -188,15 +198,6 @@ public class SO {
 				}
 				j = true;
 				n = r = false;
-			}
-			else if (taggedWords.get(i).tag().startsWith("NN")) {
-				// JJ-NN, or reset for NN-JJ
-				if (j & !j_2) { // previous JJ
-					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
-					phrases.add(s);
-				}
-				n = true;
-				j_2 = j = r = false;
 			}
 			else if (taggedWords.get(i).tag().startsWith("RB")) {
 				// reset for RB-VB or RB-JJ
