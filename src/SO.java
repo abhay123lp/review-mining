@@ -191,16 +191,16 @@ public class SO {
 			}
 			else if (taggedWords.get(i).tag().startsWith("NN")) {
 				// JJ-NN, or reset for NN-JJ
-				if (j) { // previous JJ
+				if (j & !j_2) { // previous JJ
 					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
 					phrases.add(s);
 				}
 				n = true;
-				j = r = false;
+				j_2 = j = r = false;
 			}
 			else if (taggedWords.get(i).tag().startsWith("RB")) {
 				// reset for RB-VB or RB-JJ
-				n = j = false;
+				j_2 = n = j = false;
 				r = true;
 			}
 			else if (taggedWords.get(i).tag().startsWith("VB")) {
@@ -209,9 +209,9 @@ public class SO {
 					String s = taggedWords.get(i-1).word() + " " + taggedWords.get(i).word();
 					phrases.add(s);
 				}
-				n = j = r = false;
+				j_2 = n = j = r = false;
 			}
-			else n = j = r = false; // end of a sentence
+			else j_2 = n = j = r = false; // end of a sentence
 			
 		}
 		
