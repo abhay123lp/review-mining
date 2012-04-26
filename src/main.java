@@ -21,6 +21,8 @@ import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import edu.stanford.nlp.ling.TaggedWord;
+
 
 /**
  * 
@@ -45,10 +47,10 @@ public class main {
 		// TODO Auto-generated method stub
 		//Opinion opinion2 = new Opinion();
 		//opinion2.getCntFromTweeter("source:twitter4j yusukey");
-		runSentenceWiseAlgo();
+		//runSentenceWiseAlgo();
 	   
 		//testGoogleSearchResult();
-
+		testTwoWordPhrase();
 	}
 	public static void runSentenceWiseAlgo(){
 		HashMap<Review, ArrayList<ArrayList<String>>> hm = new HashMap<Review, ArrayList<ArrayList<String>>>();
@@ -215,16 +217,22 @@ public class main {
 						ArrayList<String> phrases = new ArrayList<String>();//so.getTwoWordPhrases(review.text);
 						ArrayList<ArrayList> tokenizeds = tagging.getTaggingSplittedSentence(review.text);
 						ArrayList<ArrayList> phraseList = new ArrayList<ArrayList>();
-						int i=0, k, sum=0;
+						int i=0, k, sum=0, multiplier=1;
 						fw.writeLine(review.text + "\r\n" + tokenizeds);
 						for (ArrayList sentenceTokens: tokenizeds) { 
 							phrases = so.getTwoWordPhrases2(sentenceTokens);
+							// check But
+							if (sentenceTokens.size() > 0) {
+								TaggedWord tw = (TaggedWord) sentenceTokens.get(0);
+								multiplier = tw.word().toLowerCase().equals("but")
+										? -1 : 1;
+							}
 							fw.writeLine(phrases.toString());
 							phraseList.add(phrases);
 							for (String s: phrases) {
 								k = so.getPolarityOfPhrase(s);
 								fw.writeLine(s + " : " + k );
-								sum += k;
+								sum += k * multiplier;
 								i++;
 							}
 						}
