@@ -194,13 +194,18 @@ public class main {
 		DAO dao = new DAO();
 		int count = 0, reviewcount=0;
 		int quota = 50;
+		// Online from Xinjiang
+		int amount = 0;
+		Opinion opinion2 = new Opinion();
+		long excellent = opinion2.getCntFromBing("excellent");
+		long poor = opinion2.getCntFromBing("poor");
 		//Timestamp t = 
 		try {
 			ArrayList<Integer> reviewIds = dao.getIdsByVeryCustomQuery();
 			FileWrite phraseFile = new FileWrite("reviewPhrases.txt");
 			FileWrite ratingsFile = new FileWrite("ratings.txt");
 			FileWrite fw = new FileWrite("test_output_0.txt");
-			while (true) {
+			while (true && reviewcount < 300) {
 				int start = count * quota;
 				if (start >= reviewIds.size()) break;
 				int end = start + quota >= reviewIds.size() ? reviewIds.size()
@@ -218,6 +223,10 @@ public class main {
 						ArrayList<ArrayList> tokenizeds = tagging.getTaggingSplittedSentence(review.text);
 						ArrayList<ArrayList> phraseList = new ArrayList<ArrayList>();
 						int i=0, k, sum=0, multiplier=1;
+						
+						int cntSO = 0;  // for online SO from Xinjiang
+						double sumSO=0.0;   // for online SO from Xinjiang
+						
 						fw.writeLine(review.text + "\r\n" + tokenizeds);
 						for (ArrayList sentenceTokens: tokenizeds) { 
 							phrases = so.getTwoWordPhrases2(sentenceTokens);
@@ -234,16 +243,26 @@ public class main {
 								fw.writeLine(s + " : " + k );
 								sum += k * multiplier;
 								i++;
+								
+								// SO online from Xinjiang
+								Opinion opinion = new Opinion();
+								long postive = opinion.getCntFromBing(s.trim() + " excellent");
+								long negtive = opinion.getCntFromBing(s.trim() + " poor");
+								double score = Math.log((double)(postive*poor)/(double)(negtive*excellent+0.001));
+								sumSO += score * multiplier;
+								cntSO++;
 							}
 						}
 						double cr = (i > 0 ?(1.0*sum/i):0);
+						double crSO = cntSO > 0 ? sumSO / cntSO : 0;
 						fw.writeLine("rating: "+ review.rating + " " + cr);
 						phraseFile.writeLine(review.id + "::"
 								+ review.rating + "::"
 								+ phraseList.toString());
 		
 						ratingsFile.writeLine(review.id + " " + review.rating + " " + cr + " "
-								+ ((review.rating > 3) ? (cr > 0 ? 0 : 3): (cr < 0 ? 1 : 2) ));
+								+ ((review.rating > 3) ? (cr > 0 ? 0 : 3): (cr < 0 ? 1 : 2) ) + " "
+								+ crSO + " " + ((review.rating > 3) ? (crSO > 0 ? 0 : 3): (crSO < 0 ? 1 : 2) ) + " ");
 						// tp 0, tn 1, fp 2, fn 3
 						
 						System.out.println("... processed " + ++reviewcount + " ... id: " + review.id);
